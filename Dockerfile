@@ -1,20 +1,21 @@
-
-FROM maven:3.9-eclipse-temurin-17 AS build
-
+# ---------- Stage 1: Build ----------
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
+# Cache dependencies first
 COPY pom.xml .
-RUN mvn -B dependency:go-offline
+RUN mvn dependency:go-offline -B
 
+# Build the jar
 COPY src ./src
-RUN mvn -B clean package -DskipTests
+RUN mvn clean package -DskipTests -B
 
-FROM eclipse-temurin:17-jre
-
+# ---------- Stage 2: Run ----------
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 5000
 
-ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
