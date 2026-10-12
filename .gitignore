@@ -4,3 +4,5 @@ target/
 *.iml
 .env
 application-local.properties
+hs_err_pid*.log
+hs_err_pid*.log
